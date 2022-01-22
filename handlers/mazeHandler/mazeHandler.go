@@ -38,7 +38,20 @@ func InsertMaze() http.HandlerFunc {
 
 func DeleteMaze() http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) {
+		mazeId := stringUtil.ParseUint(chi.URLParam(r, "id"))
+		isDeleted, err := database.DeleteOne("maze", bson.M{"mazeId": mazeId})
+		if err != nil {
+			log.Fatal(err)
+		}
 
+		message := "couldn't deleted"
+		if isDeleted {
+			message = "successfully deleted"
+		}
+		httpUtil.JSON(w, r, map[string]interface{}{
+			"message": message,
+			"mazeId":  mazeId,
+		})
 	}
 	return fn
 }

@@ -62,5 +62,16 @@ func FindById(collection string, filter interface{}, results *maze.MongoMaze) er
 		return err
 	}
 	return nil
+}
 
+func DeleteOne(collection string, filter interface{}) (bool, error) {
+	deleteResult, err := db.Collection(collection).DeleteOne(context.TODO(), filter)
+	if deleteResult.DeletedCount == 0 {
+		log.Printf("Invalid maze id")
+		return false, err
+	}
+	if nil != err {
+		return false, err
+	}
+	return true, nil
 }
