@@ -2,6 +2,7 @@ package mazeHandler
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/go-chi/chi"
 	"go.mongodb.org/mongo-driver/bson"
 	"green/database"
@@ -11,6 +12,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+)
+
+const (
+	DELETED  string = "deleted."
+	INSERTED        = "inserted."
+	UPDATED         = "updated."
 )
 
 func InsertMaze() http.HandlerFunc {
@@ -24,13 +31,8 @@ func InsertMaze() http.HandlerFunc {
 
 		isInserted, err := database.InsertOne("maze", bson.M{"maze": newMaze.Maze, "mazeId": newMaze.MazeId})
 
-		message := "successfully inserted"
-		if !isInserted {
-			message = "couldn't inserted"
-			w.WriteHeader(http.StatusBadRequest)
-		}
 		httpUtil.JSON(w, r, map[string]interface{}{
-			"message": message,
+			"message": getHTTPBodyMessage(w, isInserted, INSERTED),
 			"mazeId":  newMaze.MazeId,
 		})
 	}
@@ -45,14 +47,8 @@ func DeleteMaze() http.HandlerFunc {
 			log.Println("err in deletion: ", err)
 		}
 
-		message := "successfully deleted"
-		if !isDeleted {
-			message = "couldn't deleted"
-			w.WriteHeader(http.StatusNotFound)
-		}
-
 		httpUtil.JSON(w, r, map[string]interface{}{
-			"message": message,
+			"message": getHTTPBodyMessage(w, isDeleted, DELETED),
 			"mazeId":  mazeId,
 		})
 	}
@@ -61,7 +57,20 @@ func DeleteMaze() http.HandlerFunc {
 
 func UpdateMaze() http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) {
+		var updatedMaze maze.Maze
+		updatedMazeId := stringUtil.ParseUint(chi.URLParam(r, "id"))
+		jsonBody, err := ioutil.ReadAll(r.Body)
+		err = json.Unmarshal(jsonBody, &updatedMaze)
+		if err != nil {
+			log.Println("unmarshal HTTP body err: ", err)
+		}
 
+		isUpdated, err := database.UpdateOne("maze", bson.M{"mazeId": updatedMazeId}, bson.M{"maze": updatedMaze.Maze})
+
+		httpUtil.JSON(w, r, map[string]interface{}{
+			"message": getHTTPBodyMessage(w, isUpdated, UPDATED),
+			"mazeId":  updatedMazeId,
+		})
 	}
 	return fn
 }
@@ -77,4 +86,16 @@ func GetMaze() http.HandlerFunc {
 		httpUtil.JSON(w, r, maze)
 	}
 	return fn
+}
+
+func getHTTPBodyMessage(w http.ResponseWriter, isSuccess bool, message string) (messageBody string) {
+	switch isSuccess {
+	case true:
+		messageBody = fmt.Sprintf("Successfully %s", message)
+		w.WriteHeader(http.StatusOK)
+	case false:
+		messageBody = fmt.Sprintf("Couldn't %s", message)
+		w.WriteHeader(http.StatusBadRequest)
+	}
+	return
 }

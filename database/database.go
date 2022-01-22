@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"green/config"
@@ -31,7 +30,18 @@ func Init() error {
 
 func InsertOne(collection string, newDocument interface{}) (isInserted bool, err error) {
 	insertResult, err := db.Collection(collection).InsertOne(context.Background(), newDocument)
-	fmt.Println(insertResult, err)
+	if insertResult.InsertedID == nil || err != nil {
+		log.Printf("Invalid insertion %s, InsertedId: %d", err, insertResult.InsertedID)
+		return false, err
+	}
+	return true, nil
+}
+func UpdateOne(collection string, filter interface{}, updatedDocument interface{}) (isUpdated bool, err error) {
+	updateResult, err := db.Collection(collection).UpdateOne(context.Background(), filter, updatedDocument)
+	if err != nil || updateResult.MatchedCount == 0 {
+		log.Printf("Update err: %s, updatedCount: %d ", err, updateResult.UpsertedCount)
+		return false, err
+	}
 	return true, nil
 }
 func FindById(collection string, filter interface{}, results *maze.Maze) error {
@@ -44,11 +54,8 @@ func FindById(collection string, filter interface{}, results *maze.Maze) error {
 
 func DeleteOne(collection string, filter interface{}) (bool, error) {
 	deleteResult, err := db.Collection(collection).DeleteOne(context.TODO(), filter)
-	if deleteResult.DeletedCount == 0 {
-		log.Printf("Invalid maze id")
-		return false, err
-	}
-	if nil != err {
+	if err != nil || deleteResult.DeletedCount == 0 {
+		log.Printf("Deletion err: %s, deletetedCount: %d ", err, deleteResult.DeletedCount)
 		return false, err
 	}
 	return true, nil
