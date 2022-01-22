@@ -35,7 +35,6 @@ func GetBody(r *http.Request, v interface{}) error {
 }
 
 func JSON(w http.ResponseWriter, r *http.Request, v interface{}) {
-
 	buf := &bytes.Buffer{}
 	enc := json.NewEncoder(buf)
 	enc.SetEscapeHTML(true)

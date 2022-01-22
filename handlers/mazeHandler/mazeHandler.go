@@ -2,11 +2,9 @@ package mazeHandler
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/go-chi/chi"
 	"go.mongodb.org/mongo-driver/bson"
 	"green/database"
-	"green/handlers"
 	"green/models/maze"
 	"green/utils/httpUtil"
 	"green/utils/stringUtil"
@@ -17,21 +15,24 @@ import (
 
 func InsertMaze() http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		var maze maze.Maze
-		err := json.NewDecoder(r.Body).Decode(&maze)
-		if err != nil {
-			handlers.SetHTTPStatus(w, http.StatusBadRequest, "StatusBadRequest", 0)
-			return
-		}
-		defer r.Body.Close()
-
+		var newMaze maze.Maze
 		jsonBody, err := ioutil.ReadAll(r.Body)
-		err = json.Unmarshal(jsonBody, &maze)
+		err = json.Unmarshal(jsonBody, &newMaze)
 		if err != nil {
-			fmt.Println(err)
+			log.Println("unmarshall err: ", err)
 		}
-		fmt.Println(maze)
 
+		isInserted, err := database.InsertOne("maze", bson.M{"maze": newMaze.Maze, "mazeId": newMaze.MazeId})
+
+		message := "successfully inserted"
+		if !isInserted {
+			message = "couldn't inserted"
+			w.WriteHeader(http.StatusBadRequest)
+		}
+		httpUtil.JSON(w, r, map[string]interface{}{
+			"message": message,
+			"mazeId":  newMaze.MazeId,
+		})
 	}
 	return fn
 }
@@ -41,13 +42,15 @@ func DeleteMaze() http.HandlerFunc {
 		mazeId := stringUtil.ParseUint(chi.URLParam(r, "id"))
 		isDeleted, err := database.DeleteOne("maze", bson.M{"mazeId": mazeId})
 		if err != nil {
-			log.Fatal(err)
+			log.Println("err in deletion: ", err)
 		}
 
-		message := "couldn't deleted"
-		if isDeleted {
-			message = "successfully deleted"
+		message := "successfully deleted"
+		if !isDeleted {
+			message = "couldn't deleted"
+			w.WriteHeader(http.StatusNotFound)
 		}
+
 		httpUtil.JSON(w, r, map[string]interface{}{
 			"message": message,
 			"mazeId":  mazeId,
@@ -65,7 +68,7 @@ func UpdateMaze() http.HandlerFunc {
 
 func GetMaze() http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		var maze maze.MongoMaze
+		var maze maze.Maze
 		mazeId := stringUtil.ParseUint(chi.URLParam(r, "id"))
 		err := database.FindById("maze", bson.M{"mazeId": mazeId}, &maze)
 		if err != nil {

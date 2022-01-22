@@ -13,6 +13,8 @@ import (
 var router *chi.Mux
 
 func init() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	router = chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
