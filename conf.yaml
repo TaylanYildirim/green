@@ -1,0 +1,9 @@
+servers:
+  appServer: ":10000"
+  db:
+    uri: "mongodb+srv://taylan:123@cluster0.f3wv0.mongodb.net/green?retryWrites=true&w=majority"
+    name: "green"
+
+
+
+

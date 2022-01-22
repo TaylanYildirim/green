@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
+	"green/database"
 	"green/handlers/mazeHandler"
 	"log"
 	"net/http"
@@ -38,7 +39,7 @@ func routers() *chi.Mux {
 
 func main() {
 	routers()
-	//starterDB.Init()
+	database.InitDB()
 
 	port := os.Getenv("PORT")
 	defaultPort := "10000"
