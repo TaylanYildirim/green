@@ -4,9 +4,9 @@ import (
 	"green/models/maze"
 )
 
-const (
-	ROW int = 9
-	COL     = 10
+var (
+	ROW int
+	COL int
 )
 
 type Point struct {
@@ -24,12 +24,13 @@ func isValid(row int, col int) bool {
 }
 
 func BFS(mat [][]int32, src Point, dest Point) int {
+	ROW, COL = len(mat), len(mat[0])
 	rowNum := []int{-1, 0, 0, 1}
 	colNum := []int{0, -1, 1, 0}
 	if mat[src.x][src.y] == 1 || mat[dest.x][dest.y] == 1 {
 		return -1
 	}
-	var visited [ROW][COL]bool
+	visited := create2DSlice(ROW, COL)
 	visited[src.x][src.y] = true
 	s := QueueNode{src, 0}
 
@@ -66,6 +67,14 @@ func GetShortestPath(newMaze *maze.Maze) int {
 	sourceXCoordinate, sourceYCoordinate := newMaze.GetSourceCoordinates()
 	destXCoordinate, destYCoordinate := newMaze.GetDestCoordinates()
 	return BFS(newMaze.Maze, Point{sourceXCoordinate, sourceYCoordinate}, Point{destXCoordinate, destYCoordinate})
+}
+
+func create2DSlice(row int, col int) (matrix [][]bool) {
+	matrix = make([][]bool, row)
+	for i := 0; i < row; i++ {
+		matrix[i] = make([]bool, col)
+	}
+	return
 }
 
 type Queue struct {
