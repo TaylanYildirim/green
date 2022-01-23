@@ -30,7 +30,8 @@ func InsertMaze() http.HandlerFunc {
 			log.Println("unmarshall err: ", err)
 		}
 
-		isInserted, err := database.InsertOne("maze", bson.M{"maze": newMaze.Maze, "mazeId": newMaze.MazeId})
+		isInserted, err := database.InsertOne("maze",
+			bson.M{"maze": newMaze.Maze, "mazeId": newMaze.MazeId, "shortestPath": shortestPath.GetShortestPath(&newMaze)})
 
 		httpUtil.GenerateResponse(w, r, err, map[string]interface{}{
 			"message": getHTTPBodyMessage(w, isInserted, INSERTED),
@@ -79,7 +80,6 @@ func UpdateMaze() http.HandlerFunc {
 func GetMaze() http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		var maze maze.Maze
-		shortestPath.GetShortestPath()
 		mazeId := stringUtil.ParseUint(chi.URLParam(r, "id"))
 		err := database.FindById("maze", bson.M{"mazeId": mazeId}, &maze)
 		if err != nil {

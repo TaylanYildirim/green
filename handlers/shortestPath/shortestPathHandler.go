@@ -1,7 +1,7 @@
 package shortestPath
 
 import (
-	"fmt"
+	"green/models/maze"
 )
 
 const (
@@ -23,7 +23,7 @@ func isValid(row int, col int) bool {
 	return row >= 0 && row < ROW && col >= 0 && col < COL
 }
 
-func BFS(mat [][]int, src Point, dest Point) int {
+func BFS(mat [][]int32, src Point, dest Point) int {
 	rowNum := []int{-1, 0, 0, 1}
 	colNum := []int{0, -1, 1, 0}
 	if mat[src.x][src.y] == 1 || mat[dest.x][dest.y] == 1 {
@@ -62,20 +62,10 @@ func BFS(mat [][]int, src Point, dest Point) int {
 	return -1
 }
 
-func GetShortestPath() {
-	tempMaze := [][]int{
-		{1, 1, 1, 1, 0, 1, 1, 1},
-		{1, 0, 0, 0, 0, 0, 0, 1},
-		{1, 0, 1, 1, 1, 0, 1, 1},
-		{1, 0, 0, 0, 1, 0, 0, 1},
-		{1, 1, 1, 0, 1, 1, 0, 1},
-		{1, 0, 0, 0, 1, 0, 0, 1},
-		{1, 0, 1, 1, 1, 0, 1, 1},
-		{1, 0, 0, 2, 0, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1},
-	}
-
-	fmt.Println(BFS(tempMaze, Point{7, 3}, Point{0, 4}))
+func GetShortestPath(newMaze *maze.Maze) int {
+	sourceXCoordinate, sourceYCoordinate := newMaze.GetSourceCoordinates()
+	destXCoordinate, destYCoordinate := newMaze.GetDestCoordinates()
+	return BFS(newMaze.Maze, Point{sourceXCoordinate, sourceYCoordinate}, Point{destXCoordinate, destYCoordinate})
 }
 
 type Queue struct {
