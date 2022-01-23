@@ -41,11 +41,12 @@ func InsertMaze() http.HandlerFunc {
 func DeleteMaze() http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		mazeId := stringUtil.ParseUint(chi.URLParam(r, "id"))
+
 		isDeleted, err := mazeService.DeleteOne(mazeId)
+
 		if err != nil {
 			log.Println("err in deletion: ", err)
 		}
-
 		httpUtil.GenerateResponse(w, r, err, map[string]interface{}{
 			"message": getHTTPBodyMessage(w, isDeleted, DELETED),
 			"mazeId":  mazeId,
@@ -78,7 +79,9 @@ func GetMaze() http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		var maze maze.Maze
 		mazeId := stringUtil.ParseUint(chi.URLParam(r, "id"))
+
 		err := mazeService.FindById(&maze, mazeId)
+
 		if err != nil {
 			log.Println(err)
 		}

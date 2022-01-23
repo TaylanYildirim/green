@@ -7,8 +7,12 @@ import (
 	"green/models/maze"
 )
 
+const (
+	CollectionName string = "maze"
+)
+
 func InsertOne(newMaze *maze.Maze) (bool, error) {
-	isInserted, err := database.InsertOne("maze",
+	isInserted, err := database.InsertOne(CollectionName,
 		bson.M{"maze": newMaze.Maze, "mazeId": newMaze.MazeId, "shortestPath": shortestPathApp.GetShortestPath(newMaze)})
 	if err != nil {
 		return false, err
@@ -17,7 +21,7 @@ func InsertOne(newMaze *maze.Maze) (bool, error) {
 }
 
 func DeleteOne(mazeId int) (bool, error) {
-	isDeleted, err := database.DeleteOne("maze", bson.M{"mazeId": mazeId})
+	isDeleted, err := database.DeleteOne(CollectionName, bson.M{"mazeId": mazeId})
 	if err != nil {
 		return false, err
 	}
@@ -25,7 +29,7 @@ func DeleteOne(mazeId int) (bool, error) {
 }
 
 func UpdateOne(updatedMaze *maze.Maze, mazeId int) (bool, error) {
-	isUpdated, err := database.UpdateOne("maze", bson.M{"mazeId": mazeId}, bson.M{"maze": updatedMaze.Maze})
+	isUpdated, err := database.UpdateOne(CollectionName, bson.M{"mazeId": mazeId}, bson.M{"maze": updatedMaze.Maze})
 	if err != nil {
 		return false, err
 	}
@@ -33,7 +37,7 @@ func UpdateOne(updatedMaze *maze.Maze, mazeId int) (bool, error) {
 }
 
 func FindById(maze *maze.Maze, mazeId int) error {
-	err := database.FindById("maze", bson.M{"mazeId": mazeId}, maze)
+	err := database.FindById(CollectionName, bson.M{"mazeId": mazeId}, maze)
 	if err != nil {
 		return err
 	}
