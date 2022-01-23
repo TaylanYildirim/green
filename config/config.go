@@ -20,11 +20,11 @@ type Configuration struct {
 	Servers Servers `yaml:"servers"`
 }
 
-var fileName string = "./conf.yaml"
+var FileName string = "./conf.yaml"
 var conf Configuration
 
 func Load() {
-	yamlFile, err := ioutil.ReadFile(fileName)
+	yamlFile, err := ioutil.ReadFile(FileName)
 	if err != nil {
 		log.Printf("yamlFile.Get err   #%v ", err)
 	}
