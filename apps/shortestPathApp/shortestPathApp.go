@@ -103,14 +103,14 @@ func (Q *Queue) Front() *QueueNode {
 	return Q.queue[Q.head]
 }
 
-func (Q *Queue) Push(g *QueueNode) {
+func (Q *Queue) Push(q *QueueNode) {
 	if Q.IsFull() {
 		newSlice := make([]*QueueNode, Q.capacity*2)
 		copy(newSlice, Q.queue)
 		Q.queue = newSlice
 		Q.capacity *= 2
 	}
-	Q.queue[(Q.head+Q.size)%Q.capacity] = g
+	Q.queue[(Q.head+Q.size)%Q.capacity] = q
 	Q.size = Q.size + 1
 }
 
