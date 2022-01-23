@@ -2,7 +2,6 @@ package mazeApp
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/go-chi/chi"
 	"green/models/maze"
 	"green/services/mazeService"
@@ -11,12 +10,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-)
-
-const (
-	DELETED  string = "deleted."
-	INSERTED        = "inserted."
-	UPDATED         = "updated."
 )
 
 func InsertMaze() http.HandlerFunc {
@@ -28,10 +21,10 @@ func InsertMaze() http.HandlerFunc {
 			log.Println("unmarshall err: ", err)
 		}
 
-		isInserted, err := mazeService.InsertOne(&newMaze)
+		message, err := mazeService.InsertOne(&newMaze)
 
 		httpUtil.GenerateResponse(w, r, err, map[string]interface{}{
-			"message": getHTTPBodyMessage(w, isInserted, INSERTED),
+			"message": message,
 			"mazeId":  newMaze.MazeId,
 		})
 	}
@@ -42,13 +35,10 @@ func DeleteMaze() http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		mazeId := stringUtil.ParseUint(chi.URLParam(r, "id"))
 
-		isDeleted, err := mazeService.DeleteOne(mazeId)
+		message, err := mazeService.DeleteOne(mazeId)
 
-		if err != nil {
-			log.Println("err in deletion: ", err)
-		}
 		httpUtil.GenerateResponse(w, r, err, map[string]interface{}{
-			"message": getHTTPBodyMessage(w, isDeleted, DELETED),
+			"message": message,
 			"mazeId":  mazeId,
 		})
 	}
@@ -65,10 +55,10 @@ func UpdateMaze() http.HandlerFunc {
 			log.Println("unmarshal HTTP body err: ", err)
 		}
 
-		isUpdated, err := mazeService.UpdateOne(&updatedMaze, updatedMazeId)
+		message, err := mazeService.UpdateOne(&updatedMaze, updatedMazeId)
 
 		httpUtil.GenerateResponse(w, r, err, map[string]interface{}{
-			"message": getHTTPBodyMessage(w, isUpdated, UPDATED),
+			"message": message,
 			"mazeId":  updatedMazeId,
 		})
 	}
@@ -82,22 +72,7 @@ func GetMaze() http.HandlerFunc {
 
 		err := mazeService.FindById(&maze, mazeId)
 
-		if err != nil {
-			log.Println(err)
-		}
 		httpUtil.GenerateResponse(w, r, err, maze)
 	}
 	return fn
-}
-
-func getHTTPBodyMessage(w http.ResponseWriter, isSuccess bool, message string) (messageBody string) {
-	switch isSuccess {
-	case true:
-		messageBody = fmt.Sprintf("Successfully %s", message)
-		w.WriteHeader(http.StatusOK)
-	case false:
-		messageBody = fmt.Sprintf("Couldn't %s", message)
-		w.WriteHeader(http.StatusBadRequest)
-	}
-	return
 }
