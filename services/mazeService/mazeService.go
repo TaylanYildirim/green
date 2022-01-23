@@ -25,7 +25,7 @@ func InsertOne(newMaze *maze.Maze) (string, error) {
 		return NotRectangular, nil
 	case newMaze.GetYDimension() > 100 || newMaze.GetXDimension() > 100:
 		return InvalidMazeDimension, nil
-	case false:
+	case !newMaze.IsValidMazeSpaceValues():
 		return InvalidMazeSpaceValue, nil
 	}
 
