@@ -65,7 +65,7 @@ func BFS(mat [][]int32, src Point, dest Point) int {
 
 func GetShortestPath(newMaze *maze.Maze) int {
 	sourceXCoordinate, sourceYCoordinate := newMaze.GetSourceCoordinates()
-	destXCoordinate, destYCoordinate := newMaze.GetDestCoordinates()
+	destXCoordinate, destYCoordinate := newMaze.GetDestinationCoordinates()
 	return BFS(newMaze.Maze, Point{sourceXCoordinate, sourceYCoordinate}, Point{destXCoordinate, destYCoordinate})
 }
 

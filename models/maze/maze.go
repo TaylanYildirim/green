@@ -43,7 +43,7 @@ func (M *Maze) IsValidMazeSpaceValues() bool {
 	return true
 }
 
-func (M *Maze) GetDestCoordinates() (int, int) {
+func (M *Maze) GetDestinationCoordinates() (int, int) {
 	for i := 0; i < M.GetXDimension(); i++ {
 		for j := 0; j < M.GetYDimension(); j++ {
 			switch {
