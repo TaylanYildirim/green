@@ -1,4 +1,4 @@
-package shortestPath
+package shortestPathApp
 
 import (
 	"green/models/maze"
@@ -50,11 +50,11 @@ func BFS(mat [][]int32, src Point, dest Point) int {
 			col := pt.y + colNum[i]
 			if isValid(row, col) && mat[row][col] == 0 && !visited[row][col] {
 				visited[row][col] = true
-				Adcell := QueueNode{
+				newNode := QueueNode{
 					pt:   Point{row, col},
 					dist: curr.dist + 1,
 				}
-				q.Push(&Adcell)
+				q.Push(&newNode)
 			}
 		}
 

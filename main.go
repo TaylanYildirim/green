@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
+	"green/apps/mazeApp"
 	"green/database"
-	"green/handlers/mazeHandler"
 	"log"
 	"net/http"
 	"os"
@@ -27,10 +27,10 @@ func init() {
 }
 
 func routers() *chi.Mux {
-	router.Post("/maze", mazeHandler.InsertMaze())
-	router.Delete("/maze/{id}", mazeHandler.DeleteMaze())
-	router.Put("/maze/{id}", mazeHandler.UpdateMaze())
-	router.Get("/maze/{id}", mazeHandler.GetMaze())
+	router.Post("/maze", mazeApp.InsertMaze())
+	router.Delete("/maze/{id}", mazeApp.DeleteMaze())
+	router.Put("/maze/{id}", mazeApp.UpdateMaze())
+	router.Get("/maze/{id}", mazeApp.GetMaze())
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.Write([]byte("It's up!"))

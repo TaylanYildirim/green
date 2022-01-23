@@ -1,13 +1,11 @@
-package mazeHandler
+package mazeApp
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi"
-	"go.mongodb.org/mongo-driver/bson"
-	"green/database"
-	"green/handlers/shortestPath"
 	"green/models/maze"
+	"green/services/mazeService"
 	"green/utils/httpUtil"
 	"green/utils/stringUtil"
 	"io/ioutil"
@@ -30,8 +28,7 @@ func InsertMaze() http.HandlerFunc {
 			log.Println("unmarshall err: ", err)
 		}
 
-		isInserted, err := database.InsertOne("maze",
-			bson.M{"maze": newMaze.Maze, "mazeId": newMaze.MazeId, "shortestPath": shortestPath.GetShortestPath(&newMaze)})
+		isInserted, err := mazeService.InsertOne(&newMaze)
 
 		httpUtil.GenerateResponse(w, r, err, map[string]interface{}{
 			"message": getHTTPBodyMessage(w, isInserted, INSERTED),
@@ -44,7 +41,7 @@ func InsertMaze() http.HandlerFunc {
 func DeleteMaze() http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		mazeId := stringUtil.ParseUint(chi.URLParam(r, "id"))
-		isDeleted, err := database.DeleteOne("maze", bson.M{"mazeId": mazeId})
+		isDeleted, err := mazeService.DeleteOne(mazeId)
 		if err != nil {
 			log.Println("err in deletion: ", err)
 		}
@@ -67,7 +64,7 @@ func UpdateMaze() http.HandlerFunc {
 			log.Println("unmarshal HTTP body err: ", err)
 		}
 
-		isUpdated, err := database.UpdateOne("maze", bson.M{"mazeId": updatedMazeId}, bson.M{"maze": updatedMaze.Maze})
+		isUpdated, err := mazeService.UpdateOne(&updatedMaze, updatedMazeId)
 
 		httpUtil.GenerateResponse(w, r, err, map[string]interface{}{
 			"message": getHTTPBodyMessage(w, isUpdated, UPDATED),
@@ -81,9 +78,9 @@ func GetMaze() http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		var maze maze.Maze
 		mazeId := stringUtil.ParseUint(chi.URLParam(r, "id"))
-		err := database.FindById("maze", bson.M{"mazeId": mazeId}, &maze)
+		err := mazeService.FindById(&maze, mazeId)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 		httpUtil.GenerateResponse(w, r, err, maze)
 	}
