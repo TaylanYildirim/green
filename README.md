@@ -34,5 +34,5 @@ Discover some packages of this project:
 
 ### `#1`
 For debug or run operation:
-##### `git clone https://github.com/TaylanYildirim/apsis.git`
+##### `git clone https://github.com/TaylanYildirim/green.git`
 ##### `cd green/ && go get && go run main.go`
