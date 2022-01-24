@@ -37,6 +37,51 @@ For debug or run operation:
 ##### `git clone https://github.com/TaylanYildirim/green.git`
 ##### `cd green/ && go get && go run main.go`
 
+1.
+> Insert
+
+```http
+POST https://green-code-assignment.herokuapp.com/maze
+
+```
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `id` | `string` | **Required**. maze id |
+
+2.
+> Delete
+```http
+
+DELETE https://green-code-assignment.herokuapp.com/maze/{id}
+e.g. https://green-code-assignment.herokuapp.com/maze/0
+
+```
+
+
+
+3.
+> Get
+```http
+
+GET https://green-code-assignment.herokuapp.com/maze/{id}
+e.g. https://green-code-assignment.herokuapp.com/maze/0
+
+```
+
+4.
+> Update
+```http
+
+PUT https://green-code-assignment.herokuapp.com/maze/{id}
+e.g. https://green-code-assignment.herokuapp.com/maze/0
+
+```
+
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `id` | `string` | **Required**. Maze id |
+
+
 ## Demo:
 ### Insert Demo
 
