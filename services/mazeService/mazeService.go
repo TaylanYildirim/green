@@ -60,7 +60,10 @@ func UpdateOne(updatedMaze *maze.Maze, mazeId int) (string, error) {
 	if isValidMaze != "" {
 		return isValidMaze, nil
 	}
-	isUpdated, err := database.UpdateOne(CollectionName, bson.M{"mazeId": mazeId}, bson.M{"$set": bson.M{"maze": updatedMaze.Maze}})
+
+	isUpdated, err := database.UpdateOne(CollectionName, bson.M{"mazeId": mazeId},
+		bson.M{"$set": bson.M{"maze": updatedMaze.Maze, "shortestPath": shortestPathApp.GetShortestPath(updatedMaze)}})
+
 	if err != nil {
 		log.Println("err in update: ", err)
 		return "", err
