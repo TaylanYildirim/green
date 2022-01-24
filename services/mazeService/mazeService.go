@@ -14,9 +14,9 @@ const (
 	INSERTED                     = "inserted."
 	UPDATED                      = "updated."
 	CollectionName               = "maze"
-	NotRectangular               = "Maps must be rectangular. Please check it."
-	InvalidMazeDimension         = "Maps cannot be larger than 100 in any dimension. Please check it."
-	InvalidMazeSpaceValue        = "Map spaces can not use values other than the numbers 0-2 above. Please check it."
+	NotRectangular               = "Maps must be rectangular, insertion to DB failed. Please check maze."
+	InvalidMazeDimension         = "Maps cannot be larger than 100 in any dimension, insertion to DB failed. Please check maze."
+	InvalidMazeSpaceValue        = "Map spaces can not use values other than the numbers 0-2 above. Please check maze."
 )
 
 func InsertOne(newMaze *maze.Maze) (string, error) {
