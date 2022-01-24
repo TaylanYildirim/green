@@ -12,7 +12,7 @@
 
 ## Display app:
 
- App => [Click Here to view app](https://apsis-code.herokuapp.com/).
+ App => [Click Here to view app](https://green-code-assignment.herokuapp.com/).
 
 ## Built With:
 
