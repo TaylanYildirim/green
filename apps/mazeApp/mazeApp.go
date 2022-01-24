@@ -70,9 +70,13 @@ func GetMaze() http.HandlerFunc {
 		var maze maze.Maze
 		mazeId := stringUtil.ParseUint(chi.URLParam(r, "id"))
 
-		err := mazeService.FindById(&maze, mazeId)
+		message, _ := mazeService.FindById(&maze, mazeId)
 
-		httpUtil.GenerateResponse(w, r, err, maze)
+		httpUtil.JSON(w, r, map[string]interface{}{
+			"message": message,
+			"mazeId":  mazeId,
+			"maze":    maze,
+		})
 	}
 	return fn
 }

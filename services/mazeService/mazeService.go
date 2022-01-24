@@ -1,7 +1,6 @@
 package mazeService
 
 import (
-	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"green/apps/shortestPathApp"
 	"green/database"
@@ -10,13 +9,12 @@ import (
 )
 
 const (
-	DELETED               string = "deleted."
-	INSERTED                     = "inserted."
-	UPDATED                      = "updated."
-	CollectionName               = "maze"
-	NotRectangular               = "Maps must be rectangular, operation to DB failed. Please check maze."
-	InvalidMazeDimension         = "Maps cannot be larger than 100 in any dimension, operation to DB failed. Please check maze."
-	InvalidMazeSpaceValue        = "Map spaces can not use values other than the numbers 0-2 above. Please check maze."
+	CollectionName        = "maze"
+	NotRectangular        = "Maps must be rectangular, operation to DB failed. Please check maze."
+	InvalidMazeDimension  = "Maps cannot be larger than 100 in any dimension, operation to DB failed. Please check maze."
+	InvalidMazeSpaceValue = "Map spaces can not use values other than the numbers 0-2 above. Please check maze."
+	GetSuccessMessage     = "Successfully retrieved."
+	GetFailMessage        = "Invalid Maze id, this maze id does not exist."
 )
 
 func validateMaze(maze *maze.Maze) string {
@@ -35,24 +33,24 @@ func InsertOne(newMaze *maze.Maze) (string, error) {
 	if isValidMaze != "" {
 		return isValidMaze, nil
 	}
-	isInserted, err := database.InsertOne(CollectionName,
+	respMessage, err := database.InsertOne(CollectionName,
 		bson.M{"maze": newMaze.Maze, "mazeId": newMaze.MazeId, "shortestPath": shortestPathApp.GetShortestPath(newMaze)})
 	if err != nil {
 		log.Println("err in insert: ", err)
 		return "", err
 	}
-	respBody := getRespBodyMessage(isInserted, INSERTED)
-	return respBody, err
+
+	return respMessage, err
 }
 
 func DeleteOne(mazeId int) (string, error) {
-	isDeleted, err := database.DeleteOne(CollectionName, bson.M{"mazeId": mazeId})
+	respMessage, err := database.DeleteOne(CollectionName, bson.M{"mazeId": mazeId})
 	if err != nil {
 		log.Println("err in deletion: ", err)
 		return "", err
 	}
-	respBody := getRespBodyMessage(isDeleted, DELETED)
-	return respBody, err
+
+	return respMessage, nil
 }
 
 func UpdateOne(updatedMaze *maze.Maze, mazeId int) (string, error) {
@@ -61,30 +59,22 @@ func UpdateOne(updatedMaze *maze.Maze, mazeId int) (string, error) {
 		return isValidMaze, nil
 	}
 
-	isUpdated, err := database.UpdateOne(CollectionName, bson.M{"mazeId": mazeId},
+	respMessage, err := database.UpdateOne(CollectionName, bson.M{"mazeId": mazeId},
 		bson.M{"$set": bson.M{"maze": updatedMaze.Maze, "shortestPath": shortestPathApp.GetShortestPath(updatedMaze)}})
 
 	if err != nil {
 		log.Println("err in update: ", err)
-		return "", err
+		return respMessage, err
 	}
-	respBody := getRespBodyMessage(isUpdated, UPDATED)
-	return respBody, err
+
+	return respMessage, err
 }
 
-func FindById(maze *maze.Maze, mazeId int) error {
+func FindById(maze *maze.Maze, mazeId int) (string, error) {
 	err := database.FindById(CollectionName, bson.M{"mazeId": mazeId}, maze)
 	if err != nil {
 		log.Println("err in get: ", err)
-		return err
+		return GetFailMessage, err
 	}
-	return nil
-}
-
-func getRespBodyMessage(isSuccess bool, message string) string {
-	messageBody := fmt.Sprintf("Couldn't %s", message)
-	if isSuccess {
-		messageBody = fmt.Sprintf("Successfully %s", message)
-	}
-	return messageBody
+	return GetSuccessMessage, nil
 }

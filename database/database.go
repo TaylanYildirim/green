@@ -12,6 +12,15 @@ import (
 
 var db *mongo.Database
 
+const (
+	InsertSuccessMessage string = "Maze successfully inserted."
+	InsertFailMessage           = "Maze couldn't be inserted. MazeId is not."
+	UpdateSuccessMessage        = "Maze successfully updated."
+	UpdateFailMessage           = "Maze couldn't be updated. MazeId couldn't found."
+	DeleteSuccessMessage        = "Maze successfully deleted."
+	DeleteFailMessage           = "Maze couldn't be deleted. MazeId couldn't found."
+)
+
 func Init() error {
 	dbUri := config.Get().Servers.DB.Uri
 	clientOptions := options.Client()
@@ -28,21 +37,25 @@ func Init() error {
 	return nil
 }
 
-func InsertOne(collection string, newDocument interface{}) (isInserted bool, err error) {
+func InsertOne(collection string, newDocument interface{}) (string, error) {
 	insertResult, err := db.Collection(collection).InsertOne(context.Background(), newDocument)
-	if insertResult.InsertedID == nil || err != nil {
+	if err != nil {
 		log.Printf("Invalid insertion %s, InsertedId: %d", err, insertResult.InsertedID)
-		return false, err
+		return "", err
+	} else if insertResult.InsertedID == nil {
+		return InsertFailMessage, nil
 	}
-	return true, nil
+	return InsertSuccessMessage, nil
 }
-func UpdateOne(collection string, filter interface{}, updatedDocument interface{}) (isUpdated bool, err error) {
+func UpdateOne(collection string, filter interface{}, updatedDocument interface{}) (string, error) {
 	updateResult, err := db.Collection(collection).UpdateOne(context.Background(), filter, updatedDocument)
-	if err != nil || updateResult.MatchedCount == 0 {
+	if err != nil {
 		log.Printf("Update err: %s, updatedCount: %d ", err, updateResult.UpsertedCount)
-		return false, err
+		return "", err
+	} else if updateResult.MatchedCount == 0 {
+		return UpdateFailMessage, nil
 	}
-	return true, nil
+	return UpdateSuccessMessage, nil
 }
 func FindById(collection string, filter interface{}, results *maze.Maze) error {
 	err := db.Collection(collection).FindOne(context.Background(), filter).Decode(results)
@@ -52,11 +65,13 @@ func FindById(collection string, filter interface{}, results *maze.Maze) error {
 	return nil
 }
 
-func DeleteOne(collection string, filter interface{}) (bool, error) {
+func DeleteOne(collection string, filter interface{}) (string, error) {
 	deleteResult, err := db.Collection(collection).DeleteOne(context.TODO(), filter)
-	if err != nil || deleteResult.DeletedCount == 0 {
+	if err != nil {
 		log.Printf("Deletion err: %s, deletetedCount: %d ", err, deleteResult.DeletedCount)
-		return false, err
+		return "", err
+	} else if deleteResult.DeletedCount == 0 {
+		return DeleteFailMessage, nil
 	}
-	return true, nil
+	return DeleteSuccessMessage, nil
 }
