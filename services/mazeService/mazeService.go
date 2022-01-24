@@ -50,7 +50,7 @@ func DeleteOne(mazeId int) (string, error) {
 }
 
 func UpdateOne(updatedMaze *maze.Maze, mazeId int) (string, error) {
-	isUpdated, err := database.UpdateOne(CollectionName, bson.M{"mazeId": mazeId}, bson.M{"maze": updatedMaze.Maze})
+	isUpdated, err := database.UpdateOne(CollectionName, bson.M{"mazeId": mazeId}, bson.M{"$set": bson.M{"maze": updatedMaze.Maze}})
 	if err != nil {
 		log.Println("err in update: ", err)
 		return "", err
