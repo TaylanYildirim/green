@@ -14,21 +14,27 @@ const (
 	INSERTED                     = "inserted."
 	UPDATED                      = "updated."
 	CollectionName               = "maze"
-	NotRectangular               = "Maps must be rectangular, insertion to DB failed. Please check maze."
-	InvalidMazeDimension         = "Maps cannot be larger than 100 in any dimension, insertion to DB failed. Please check maze."
+	NotRectangular               = "Maps must be rectangular, operation to DB failed. Please check maze."
+	InvalidMazeDimension         = "Maps cannot be larger than 100 in any dimension, operation to DB failed. Please check maze."
 	InvalidMazeSpaceValue        = "Map spaces can not use values other than the numbers 0-2 above. Please check maze."
 )
 
-func InsertOne(newMaze *maze.Maze) (string, error) {
+func validateMaze(maze *maze.Maze) string {
 	switch {
-	case !newMaze.IsRectangular():
-		return NotRectangular, nil
-	case newMaze.GetYDimension() > 100 || newMaze.GetXDimension() > 100:
-		return InvalidMazeDimension, nil
-	case !newMaze.IsValidMazeSpaceValues():
-		return InvalidMazeSpaceValue, nil
+	case !maze.IsRectangular():
+		return NotRectangular
+	case maze.GetYDimension() > 100 || maze.GetXDimension() > 100:
+		return InvalidMazeDimension
+	case !maze.IsValidMazeSpaceValues():
+		return InvalidMazeSpaceValue
 	}
-
+	return ""
+}
+func InsertOne(newMaze *maze.Maze) (string, error) {
+	isValidMaze := validateMaze(newMaze)
+	if isValidMaze != "" {
+		return isValidMaze, nil
+	}
 	isInserted, err := database.InsertOne(CollectionName,
 		bson.M{"maze": newMaze.Maze, "mazeId": newMaze.MazeId, "shortestPath": shortestPathApp.GetShortestPath(newMaze)})
 	if err != nil {
@@ -50,6 +56,10 @@ func DeleteOne(mazeId int) (string, error) {
 }
 
 func UpdateOne(updatedMaze *maze.Maze, mazeId int) (string, error) {
+	isValidMaze := validateMaze(updatedMaze)
+	if isValidMaze != "" {
+		return isValidMaze, nil
+	}
 	isUpdated, err := database.UpdateOne(CollectionName, bson.M{"mazeId": mazeId}, bson.M{"$set": bson.M{"maze": updatedMaze.Maze}})
 	if err != nil {
 		log.Println("err in update: ", err)
