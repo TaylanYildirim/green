@@ -38,7 +38,7 @@ For debug or run operation:
 ##### `cd green/ && go get && go run main.go`
 
 1.
-> Insert
+> Insert Maze:
 
 ```http
 POST https://green-code-assignment.herokuapp.com/maze
@@ -48,8 +48,24 @@ POST https://green-code-assignment.herokuapp.com/maze
 | :--- | :--- | :--- |
 | `id` | `string` | **Required**. maze id |
 
+ **Request Body** 
+
+     {
+         "mazeId": 0,
+         "maze" : [
+             [1,1,1,1,0,1,1,1],
+             [1,0,0,0,0,0,0,1],
+             [1,0,1,1,1,0,1,1],
+             [1,0,0,0,1,0,0,1],
+             [1,1,1,0,1,1,0,1],
+             [1,0,0,0,1,0,0,1],
+             [1,0,0,2,0,0,0,1],
+             [1,1,1,1,1,1,1,1]
+         ]
+     }
+
 2.
-> Delete
+> Delete Maze:
 ```http
 
 DELETE https://green-code-assignment.herokuapp.com/maze/{id}
@@ -60,7 +76,7 @@ e.g. https://green-code-assignment.herokuapp.com/maze/0
 
 
 3.
-> Get
+> Get Maze:
 ```http
 
 GET https://green-code-assignment.herokuapp.com/maze/{id}
@@ -69,7 +85,7 @@ e.g. https://green-code-assignment.herokuapp.com/maze/0
 ```
 
 4.
-> Update
+> Update Maze:
 ```http
 
 PUT https://green-code-assignment.herokuapp.com/maze/{id}
@@ -80,6 +96,21 @@ e.g. https://green-code-assignment.herokuapp.com/maze/0
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
 | `id` | `string` | **Required**. Maze id |
+
+ **Request Body** 
+
+     {
+         "maze" : [
+             [1,1,1,1,0,1,1,1],
+             [1,0,0,0,0,0,0,1],
+             [1,0,1,1,1,0,1,1],
+             [1,0,0,0,1,0,0,1],
+             [1,1,1,0,1,1,0,1],
+             [1,0,0,0,1,0,0,1],
+             [1,0,0,2,0,0,0,1],
+             [1,1,1,1,1,1,1,1]
+         ]
+     }
 
 
 ## Demo:
